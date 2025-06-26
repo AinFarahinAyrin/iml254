@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        #home {
+        font-family: 'Times New Roman', Times, serif;
+        }
+
+        #education {
+        font-family:"Courier New", Courier, monospace;
+        }
+        
+        #skills {
+        font-family: 'Courier', monospace;
+        }
+
+        #family {
+        font-family: 'Optima', Times;
+        }
+
+        body {
+            font-family:'Inter', sans-serif;
+            font-variation-settings: 'wght' 400;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* 3D Background Canvas */
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        }
+
+        /* Header */
+        header {
+            background: rgba(173, 216, 230, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 130px;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        }
+        header {
+            transition: top 0.5s ease-in-out;
+}
+
+        header.hide {
+            top: -140px; /* completely hide it(adjust to your header height) */
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo img {
+            z-index: 1001;
+            position: relative;
+            height: 130px;
+            width: auto;
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4a148c;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            background: rgba(186, 104, 200, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        nav a.active {
+            background: linear-gradient(45deg, #ba68c8, #81c784);
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            min-height: calc(100vh - 140px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: #4a148c;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: #6a1b9a;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #ba68c8;
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-family: 'fantasy', sans-serif;
+            font-size: 1.5rem;
+            color: #7b1fa2;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #e1bee7, #b3e5fc);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .emphasis {
+            font-style: italic;
+            color: #6a1b9a;
+            font-weight: 500;
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Contact Links */
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .contact-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #ba68c8, #81c784);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.01s ease;
+            font-weight: bold;
+        }
+
+        .contact-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Experience Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #ba68c8, #81c784);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            margin-left: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            background: #ba68c8;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        /* Footer/Disclaimer */
+        footer {
+            background: rgba(74, 20, 140, 0.9);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .disclaimer {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(186, 104, 200, 0.3);
+            border-top: 5px solid #ba68c8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- 3D Background Canvas -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <img src="HYPERION_KB.png" alt="Logo" id="logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#family" class="nav-link">Family</a></li>
+                    <li><a href="#education" class="nav-link">Education</a></li>
+                    <li><a href="#experience" class="nav-link">Experience</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Home Section -->
+            <section id="home" class="section active">
+                <h1>WELCOME TO MY WEBSITE!</h1>
+                <div style="text-align: center;">
+                <h2>My Name is <span class="highlight">Ain Farahin Ajdmi</span></h2>
+                </div>
+                <div style="text-align: center;">
+                    <img src="profile image.jpg" alt="Profile Picture" style="width: 200px; height: 200px; border-radius: 50%; margin-bottom: 1rem;">
+                    <p style="text-align: center; font-size: 1.2rem; margin: 2rem 0;">
+                        I'm a student of KCDIM144 4D. I come from a humble family of 5 from Sabah, Malaysia. Precisely the small village just behind Tawau International Airport. I am currently 20 years old and my MBTI is <span class="highlight">INTJ.</span>
+                        I am interested in many field especially <span class="emphasis">history, technology, geography, and art.</span> and anything that involve me being creative person. Knowledge is what I always seek and thirst for. Even it just a simple cooking recipe or a new language, 
+                        I will always try to learn it. I am also a <span class="highlight">creative person</span> with a weird interest in basically everything that I can get my head on.
+                    </p>
+                    <div class="contact-links">
+                        <a href="https://open.spotify.com/user/s7qantevr01glf6pl52uz57x?si=KdVCoA8CTd2u_J9PNvWT3g" class="contact-link">Spotify</a>
+                        <a href="https://Instagram.com//kairisa.ayrin" class="contact-link" target="_blank">Instagram</a>
+                        <a href="https://pinterest.com//ainf0637" class="contact-link" target="_blank">Pinterest</a>
+                        <a href="RESUME.docx" class="contact-link" target="_blank">Download Resume</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="section">
+                <h2>About Me</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+                    I'm a <strong>multi-talented woman</strong> with over 10 year of active experience in various fields of interest. I'm particularly passionate about
+                    <em> history, technology, geography, and  many more.</em> My passion lies in learning everything that can level up my knowledge.
+                    It can be as little as learning new languages or learning how to create a website and walking through the process of preserving artifacts.
+                </p>
+                <h3>Core Competencies</h3>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>Leadership:</strong> Library prefect, School Prefect, vice president of INSTIC 2024/2025, SMPP of MPP UiTM Kedah 2024/2025</li>
+                    <li><strong>Sport:</strong> Archery, Horseback-riding, Badminton, Volleyball, Track and Field.</li>
+                    <li><strong>Linguistic</strong> English, English literatures, Malay literatures. Japanese literatures, Chinese literatures</li>
+                    <li><strong>Technology</strong> HTML, Cataloging, Citation, Python, Adobe Illustrator, Adobe Photoshop, Canva</li>
+                </ul>
+                <p class="emphasis" style="margin-top: 1.5rem;">
+                    "Silentium Est Potentia"
+                </p>
+            </section>
+
+            <!--Family section-->
+            <section id="family" class="section">
+                <h2>Family</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <img src="gambar ayah.jpg" alt="Father's photo" style="width: 200px; height: 200px; border-radius: 50%; margin-bottom: 1rem;">
+                        <h3>Father</h3>
+                        <p><strong>Ajdmi bin Ab Mahmud</strong></p>
+                        <p>Hard working man, my hero. I call him by two names <span class="highlight">Ayah</span> and <span class="highlight">Papa</span></p>
+                        <p>Basically the one that know it all, just like my mother. He love to fishing and football.</p>
+                        <p><em>Government worker under Agriculture sector, Malaysia Cocoa Board, Sabah Division, Kunak branch</em></p>
+                    </div>
+                    <div class="skill-card">
+                        <img src="gambar ibuk.jpg" alt="Mother's photo" style="width: 200px; height: 200px; border-radius: 50%; margin-bottom: 1rem;">
+                        <h3>Mother</h3>
+                        <p><strong>Ernanie Binti Opley</strong></p>
+                        <p><span class = "highlight">My angel</span>. Always have that serious face but have kindest heart. I call her ibuk due to her family side mother tongue.</p>
+                        <p><span class="emphasis">p/s: Her cooking especially Javanese Rawon, Spaghetti Bolognese and nasi goreng is the best.</span></p>
+                        <p><em>Housewife, Former Clerk at Sawit Kinabalu (now SD Guthrie), Tawau Division</em></p>
+                    </div>
+                    <div class="skill-card">
+                        <img src="yana & Icak.jpg" alt="Siblings's photo" style="width: 180px; height: 200px; border-radius: 50%; margin-bottom: 1rem;">
+                        <h3>Siblings</h3>
+                        <p><strong>Alya Adriana and Alyssa Hana</strong></p>
+                        <p>My not too little sisters. They are now 18 and 15 year old.</p>
+                        <p>They are now studying at <span class="highlight">Sekolah Menengah Kebangsaan Madai</span></p>
+                        <p><em>New Form 6 student and a troublemaker Form 3</em></p>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Education Section -->
+            <section id="education" class="section">
+                <h2>Education</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3> Primary School Period</h3>
+                        <p><strong>Sekolah Kebangsaan Kukusan Preschool [Tawau]</strong> | 2009 - 2010</p>
+                        <p><strong>Sekolah Kebangsaan Wakuba Preschool until Year 3 [Tawau]</strong> | 2010 - 2015</p>
+                        <p><strong>Sekolah Kluster Kecemerlangan Ladang Binuang [Kunak]</strong> | 2015 - 2017</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>UPSR <span class="highlight"> 1A 2B 3C</span></li>
+                            <li>58th World Jamboree On The Air & 19th World Jamboree On The Internet <span class="highlight"> participation.</span></li>
+                            <li>NILAM [130 book]</li>
+                            <li>Uniform School Camping 2016 <span class="highlight"> participation.</span></li>
+                            <li>Uniform School Camping 2017 <span class="highlight"> participation.</span></li>
+
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Secodary School Period</h3>
+                        <p><strong>Sekolah Menengah Kebangsaan Madai, Kunak</strong> | 2018 - 2023</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>SPM <span class="highlight"> 6A- 2B 1C 1D</span></li>
+                            <li> Top 19 out of <span class="highlight">26 Best SPM Candidate 2022 </span></li>
+                            <li>Anugerah Khas Kualiti Hal Ehwal Murid [Ikon Sahsiah Amalan Terbaik] 2022</i></li>
+                            <li>Anugerah Khas Guru Penolong Kanan Hal Ehwal Murid 2022</li>
+                            <li>Anugerah Mata Pelajaran Terbaik 2022 in<span class="highlight"> [History, Geography, Science, English, Visual Art Education, Sport Science] </span></li>
+                            <li><span class="highlight">5th place</span> in State Level Spelling Bee Competition 2022</li>
+                            <li><span class="highlight">21st place</span> in State level Archery Tournament by Majlis Sukan-Sukan Sekolah Sabah 2022</li>
+                            <li> State Level Firefighter Cadet Emergency Medical Rescue Services Team 2022 <span class="highlight"> participation.</span></li>
+                            <li>Anugerah Pengurusan Asrama Puteri[ASPURI] 2022 <span class="highlight"> EXCO Kerohanian</span></li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>University Period</h3>
+                        <p><strong>University Teknologi MARA, Merbok Campus</strong> | 2023-now</p>
+                        <ul style="margin-top: 1rem;">
+                            <li><span class="highlight">Diploma In Library Informatics</span> KCDIM 144 4D student</li>
+                            <li>CGPA from semester One until the current one:</li>
+                            <li>Semester 1:<span class="highlight">3.52</span></li>
+                            <li>Semester 2:<span class="highlight">3.22</span></li>
+                            <li>Semester 3:<span class="highlight">3.26</span></li>
+                            <li>participated in many program and becoming a member of various clubs.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience-->
+            <section id="experience" class="section">
+                <h2>Experience</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>Secretariat of Student Representative Council</h3>
+                        <p><strong>Student Representative Council, UiTM Kedah</strong> | 2024 - 2025</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>Secretariat of <span class="highlight">Department of Sport, Culture and Curriculum</span></li>
+                            <li>helping organizing program by the SRC with a full commitment</li>
+                        </ul>
+                    </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>Vice President for Faculty/Course Club</h3>
+                        <p><strong>INSTICS, UiTM Kedah</strong> | 2024 - 2025</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>Vice President of <span class="highlight">INSTICS club.</span></li>
+                            <li>Handling paperwork and planning program.</li>
+                            <li>helping organizing program by the SRC with a full commitment</li>
+                            <li>Decorating for Club Fest</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>ZERO 2 HERO SPM Camp 2024</h3>
+                        <p><strong>Facilitator, Mentor</strong> | 2024</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>Collaborating with MYSCHOLARLAB to help the student discoving their tertiary education path in <strong>Malaysia or overseas.</strong></li>
+                            <li>Implementing intensive leadership program to 60 student.</li>
+                            <li>Creating a clear pathway for them to chose with guidance and encouragement.<em></em></li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>Exco Art of Music and Art of Vocal</h3>
+                        <p><strong>Kelab Artis Budaya Warisan [UiTM]</strong> | 2023-2024</p>
+                        <ul style="margin-top: 1rem;">
+                            <li>Handling audition</li>
+                            <li>Searching for new talents to be a part of KATARSIS talent.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills" class="section">
+                <h2>Technical Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <h3>Frontend</h3>
+                        <p><strong>HTML5, CSS, JavaScript</strong></p>
+                        <p>Web Development</p>
+                        <p><em>Responsive Design, Interactive UI</em></p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Backend</h3>
+                        <p><strong>Python</strong></p>
+                        <p><em>Data Processing, Scripting.</em></p>
+                        <p>Kahoot, Quizlet, Google Forms for data collection</p>
+                        <p>Storyboarding.</p>
+                        <p>Scientific Writing.</p>
+                        <p>Scientific Communication</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Software</h3>
+                        <p><strong>Adobe Photoshop.</strong></p>
+                        <p>Adobe Illustrator.</p>
+                        <p>Adobe InDesign.</p>
+                        <p><em>Canva.</em></p>
+                        <p> Google Snapseed.</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Librarianship</h3>
+                        <p><strong>Cataloging</strong></p>
+                        <p>Classification.</p>
+                        <p>Information lteracy.</p>
+                        <p><em>Librarianship tools.</em></p>
+                        <p>Library management.</p>
+                        <p>Library database management.</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Visual Art & Design</h3>
+                        <p><strong>Creative writing.</strong></p>
+                        <p>Typography & Layout.</p>
+                        <p>Script writing</p>
+                        <p><em>Traditional Media</em></p>
+                        <p>Composition</p>
+                        <p>Mixed Media</p>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Other skills</h3>
+                        <p><strong>Sport Science.</strong></p>
+                        <p>Sport Strategy.</p>
+                        <p>Archery</p>
+                        <p><em>Fitness and Wellness</em></p>
+                        <p>Visual Storytelling</p>
+                        <p>Potraits & Landscape Photography</p>
+                        <p>Library atabase management.</p>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="section">
+                <h2>Let Get In Touch</h2>
+                <p style="text-align: center; font-size: 1.1rem; margin: 2rem 0;">
+                    I'm always interested in <span class="highlight"> anything that do not involves pointless gossip</span> and topics like history, technology, current situation and as long as it do not involves manipulation.
+                    Let's connect and discuss how we can work together!
+                </p>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <p><strong>Email:</strong> <a href="ainf0637@gmail.com" style="color: #6a1b9a;">ainf0637@gmail.com</a></p>
+                    <p><strong>Phone:</strong> <span class="emphasis">+60 19-8952370</span></p>
+                    <p><strong>Location:</strong> Sabah, Malaysia</p>
+                </div>
+                <div class="contact-links">
+                    <a href="mailto:ainf0637@gmail.com" class="contact-link">Send Email</a>
+                    <a href="https://pinterest.com//ainf0637" class="contact-link" target="_blank">Pinterest</a>
+                    <a href="https://instagram.com//kairisa.ayrin" class="contact-link" target="_blank">View Instagram</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer with Disclaimer -->
+    <footer>
+        <p>&copy; 2024 HYPERION_KB.</p>
+        <div class="disclaimer">
+            <p><strong>Disclaimer:</strong> This is a demonstration resume website for individuals assignment puposes.
+            All personal information, experience details, and contact information are fictional and for display purposes only. 
+            The 3D background animations are optimized for modern browsers and may vary in performance across different devices. 
+            This website uses modern CSS and JavaScript features that may not be fully supported in older browsers. 
+            For the best experience, please use the latest version of Chrome, Firefox, Safari, or Edge.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 3D Background Animation
+        class Background3D {
+            constructor() {
+                this.canvas = document.getElementById('canvas3d');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: 0, y: 0 };
+                
+                this.init();
+                this.createParticles();
+                this.animate();
+                this.bindEvents();
+            }
+
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                const particleCount = Math.min(150, window.innerWidth / 10);
+                
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        z: Math.random() * 1000,
+                        vx: (Math.random() - 0.1 ) * 0.1,
+                        vy: (Math.random() - 0.1) * 0.1,
+                        vz: (Math.random() - 0.1) * 4,
+                        color: `hsla(${Math.random() * 60 + 250}, 70%, 70%, 0.8)`,
+                        size: Math.random() * 3 + 1
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Create gradient background
+                const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                gradient.addColorStop(0, 'rgba(227, 242, 253, 0.1)');
+                gradient.addColorStop(1, 'rgba(243, 229, 245, 0.1)');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Update and draw particles
+                this.particles.forEach((particle, index) => {
+                    // Update position
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.z += particle.vz;
+
+                     // Mouse interaction
+                    const dx = this.mouse.x - particle.x;
+                    const dy = this.mouse.y - particle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        particle.vx += dx * 0.00005;
+                        particle.vy += dy * 0.00005;
+                    }
+
+                    // 3D projection
+                    const scale = 800 / (800 + particle.z);
+                    const x2d = (particle.x - this.canvas.width / 2) * scale + this.canvas.width / 2;
+                    const y2d = (particle.y - this.canvas.height / 2) * scale + this.canvas.height / 2;
+
+                    // Boundary check and reset
+                    if (particle.z > 1000 || particle.z < 0 || 
+                        particle.x < 0 || particle.x > this.canvas.width ||
+                        particle.y < 0 || particle.y > this.canvas.height) {
+                        particle.x = Math.random() * this.canvas.width;
+                        particle.y = Math.random() * this.canvas.height;
+                        particle.z = 0;
+                    }
+
+                    // Draw particle
+                    this.ctx.save();
+                    this.ctx.globalAlpha = Math.max(0.1, scale);
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x2d, y2d, particle.size * scale, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                
+
+                    // Connect nearby particles
+                    for (let j = index + 1; j < this.particles.length; j++) {
+                        const other = this.particles[j];
+                        const dist = Math.sqrt(
+                            Math.pow(particle.x - other.x, 2) + 
+                            Math.pow(particle.y - other.y, 2)
+                        );
+                        
+                        if (dist < 120) {
+                            this.ctx.save();
+                            this.ctx.globalAlpha = (120 - dist) / 120 * 0.5;
+                            this.ctx.strokeStyle = 'rgba(186, 104, 200, 0.3)';
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(x2d, y2d);
+                            
+                            const otherScale = 800 / (800 + other.z);
+                            const otherX2d = (other.x - this.canvas.width / 2) * otherScale + this.canvas.width / 2;
+                            const otherY2d = (other.y - this.canvas.height / 2) * otherScale + this.canvas.height / 2;
+                            
+                            this.ctx.lineTo(otherX2d, otherY2d);
+                            this.ctx.stroke();
+                            this.ctx.restore();
+                        }
+                    }
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+
+            bindEvents() {
+                document.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        this.mouse.x = e.touches[0].clientX;
+                        this.mouse.y = e.touches[0].clientY;
+                    }
+                });
+            }
+        }
+
+        // Navigation System
+        class Navigation {
+            constructor() {
+                this.navLinks = document.querySelectorAll('.nav-link');
+                this.sections = document.querySelectorAll('.section');
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href').substring(1);
+                        this.showSection(targetId);
+                        this.updateActiveNav(link);
+                    });
+                });
+            }
+
+            showSection(targetId) {
+                this.sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            }
+
+            updateActiveNav(activeLink) {
+                this.navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                activeLink.classList.add('active');
+            }
+        }
+
+        // Loading Screen
+        class LoadingScreen {
+            constructor() {
+                this.loadingElement = document.getElementById('loading');
+                this.init();
+            }
+
+            init() {
+                // Simulate loading time
+                setTimeout(() => {
+                    this.hide();
+                }, 2000);
+            }
+
+            hide() {
+                this.loadingElement.style.opacity = '0';
+                setTimeout(() => {
+                    this.loadingElement.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        // Error Handling and Debugging
+        class ErrorHandler {
+            constructor() {
+                this.setupErrorHandling();
+            }
+
+            setupErrorHandling() {
+                window.addEventListener('error', (e) => {
+                    console.error('JavaScript Error:', {
+                        message: e.message,
+                        source: e.filename,
+                        line: e.lineno,
+                        column: e.colno,
+                        error: e.error
+                    });
+                });
+
+                window.addEventListener('unhandledrejection', (e) => {
+                    console.error('Unhandled Promise Rejection:', e.reason);
+                });
+            }
+        }
+
+        // Performance Monitor
+        class PerformanceMonitor {
+            constructor() {
+                this.startTime = performance.now();
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('load', () => {
+                    const loadTime = performance.now() - this.startTime;
+                    console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+                    
+                    // Check for potential performance issues
+                    if (loadTime > 3000) {
+                        console.warn('Page load time is slower than expected');
+                    }
+                });
+
+                // Monitor canvas performance
+                this.monitorCanvas();
+            }
+
+            monitorCanvas() {
+                let frameCount = 0;
+                let lastTime = performance.now();
+                
+                const checkFPS = () => {
+                    frameCount++;
+                    const currentTime = performance.now();
+                    
+                    if (currentTime - lastTime >= 1000) {
+                        const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                        
+                        if (fps < 30) {
+                            console.warn(`Low FPS detected: ${fps}`);
+                        }
+                        
+                        frameCount = 0;
+                        lastTime = currentTime;
+                    }
+                    
+                    requestAnimationFrame(checkFPS);
+                };
+                
+                checkFPS();
+            }
+        }
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Initialize all components
+                new ErrorHandler();
+                new PerformanceMonitor();
+                new LoadingScreen();
+                new Background3D();
+                new Navigation();
+                
+                console.log('Resume website initialized successfully');
+                
+                // Debug information
+                console.log('Debug Info:', {
+                    userAgent: navigator.userAgent,
+                    viewport: {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    },
+                    canvasSupport: !!document.createElement('canvas').getContext,
+                    touch: 'ontouchstart' in window
+                });
+                
+            } catch (error) {
+                console.error('Failed to initialize website:', error);
+                
+                // Fallback for critical errors
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
+                        <h1 style="color: #d32f2f;">Website Error</h1>
+                        <p>Sorry, there was an issue loading the website. Please refresh the page or try again later.</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 2rem;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Additional utility functions for debugging
+        const debugUtils = {
+            logSectionChange: (sectionId) => {
+                console.log(`Navigated to section: ${sectionId}`);
+            },
+            
+            checkResponsiveness: () => {
+                const breakpoints = {
+                    mobile: window.innerWidth <= 768,
+                    tablet: window.innerWidth > 768 && window.innerWidth <= 1024,
+                    desktop: window.innerWidth > 1024
+                };
+                console.log('Current breakpoint:', breakpoints);
+                return breakpoints;
+            },
+            
+            testAnimations: () => {
+                const animations = document.getAnimations();
+                console.log(`${animations.length} animations currently running`);
+                return animations;
+            }
+        };
+
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (currentScroll > lastScrollTop) {
+            // Scrolling down
+            header.classList.add('hide');
+            } else {
+            // Scrolling up
+            header.classList.remove('hide');
+            }
+
+            lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For mobile
+        });
+
+  
+        // Make debug utils available globally for testing
+        window.debugUtils = debugUtils;
+    </script>
+</body>
+</html>
